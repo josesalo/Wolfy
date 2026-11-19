@@ -1,0 +1,30 @@
+{
+ "name": "Wolfy",
+ "short_name": "Wolfy",
+ "description": "Entreno, espalda, piscina y comida con Wolfy.",
+ "lang": "es",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#FBF6F3",
+ "theme_color": "#EAF6FC",
+ "icons": [
+  {
+   "src": "img/icon192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "img/icon512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "img/icon512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
