@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#D0DAE3">
 <title>Wolfy</title>
 <link rel="manifest" href="manifest.webmanifest">
-<script>window.__PWA=true;window.__BUILD="c0205ac000";</script>
+<script>window.__PWA=true;window.__BUILD="de79e3ecb4";</script>
 <link rel="apple-touch-icon" sizes="180x180" href="img/wolfy-icon-180.png">
 <link rel="icon" type="image/png" href="img/wolfy-icon-512.png">
 <style>
@@ -760,13 +760,49 @@ const MED_INFO = {
 /* ================== NUTRICIÓN ================== */
 // [clave, nombre, hora por defecto, % del objetivo diario]
 const MEALS = [
-  ['des','Desayuno','10:00',0.20],
-  ['mm','Media mañana · post-entreno','12:15',0.20],
-  ['com','Comida','15:00',0.27],
-  ['mer','Merienda','19:00',0.13],
-  ['cen','Cena','22:15',0.20],
+  ['des','Desayuno','10:00',0.24],
+  ['mm','Post-entreno (opcional)','12:30',0],
+  ['com','Comida','15:00',0.31],
+  ['mer','Merienda','19:00',0.22],
+  ['cen','Cena','22:15',0.23],
   ['noc','Recena (comodín)','00:30',0],
 ];
+// Platos del plan de nutrición (20 nov 2026): [nombre, kcal, g proteína, detalle] · valores aproximados
+const PLATOS = {
+  des:[
+    ['Tostadas de pavo y queso',710,39,'Café con leche (250 ml) · 100 g de pan · 1 cda AOVE · 60 g pavo · 40 g queso'],
+    ['Tostadas de jamón + yogur proteico',750,52,'Café con leche · 100 g de pan con tomate y 1 cda AOVE · 50 g jamón · 1 yogur proteico'],
+    ['Bol de yogur con avena',740,45,'Café con leche · 1 yogur proteico + 1 griego · 50 g avena · 1 plátano · 20 g nueces'],
+    ['Batido de desayuno (sin hambre)',665,44,'Café · 300 ml leche · 1 cacito whey · 50 g avena · 1 plátano · 15 g crema de cacahuete'],
+  ],
+  mm:[
+    ['Batido post-entreno',255,30,'250 ml leche semidesnatada · 1 cacito whey. Ese día, merienda sin whey'],
+    ['Yogur proteico + plátano',220,21,'1 yogur proteico · 1 plátano'],
+  ],
+  com:[
+    ['Noodles salteados con pollo',900,50,'100 g fideos (peso seco) · 150 g contramuslo · 150 g verdura de wok · 1 huevo · 1 cda aceite · soja, ajo, jengibre · sésamo'],
+    ['Ramen rápido',850,55,'100 g fideos ramen · caldo + soja/miso · 2 huevos · 120 g lomo o pollo ya hecho · cebolleta, maíz, espinacas · 1 cda aceite de sésamo o chile'],
+    ['Poke bowl fácil',950,45,'2 vasos de arroz de microondas · 150 g salmón (o 2 latas de atún) · ½ aguacate · 50 g edamame · pepino y zanahoria · soja + 15 g mayo-sriracha · sésamo'],
+    ['Tacos fríos de pollo especiado',860,54,'4 tortillas de trigo · 180 g pollo con especias y 1 cda aceite · 60 g hummus · lechuga, zanahoria, brotes de soja'],
+    ['Plato casero (carne + arroz/patata)',880,43,'150 g carne · 100 g arroz (seco) o 350 g patata · 1 cda AOVE · verdura · 40 g pan'],
+  ],
+  mer:[
+    ['Batido casero denso',645,43,'400 ml leche entera · 1 cacito whey · 50 g avena · plátano aparte. Va en un shaker'],
+    ['½ ración de gainer con leche',695,35,'137 g Origin Mass Gainer (≈500 kcal, 25 g prot, 2,5 g creatina) · 300 ml leche'],
+    ['Bocadillo + yogur + frutos secos',675,52,'80 g pan con 60 g pavo y 30 g queso · 1 yogur proteico · 30 g frutos secos'],
+  ],
+  cen:[
+    ['Tortilla francesa con pan y jamón',695,43,'3 huevos · 100 g pan con tomate · 50 g jamón · 1 cda AOVE'],
+    ['Quesadillas de pollo',710,48,'2 tortillas grandes · 120 g pollo asado · 40 g queso · 50 g guacamole'],
+    ['Salmón con patata',620,36,'150 g salmón · 250 g patata (microondas) · 1 cda AOVE · verdura'],
+    ['Pasta con atún',660,38,'100 g pasta (seco) · 1 lata de atún · tomate triturado · 20 g queso · 1 cda AOVE'],
+  ],
+  noc:[
+    ['Whey con leche',250,30,'250 ml leche · 1 cacito whey'],
+    ['Yogur griego con nueces',300,8,'1 yogur griego · 20 g nueces'],
+    ['Frutos secos (30 g)',180,6,'Un puñado'],
+  ],
+};
 const FCAT = {des:'Desayuno',pro:'Proteínas',hid:'Hidratos',lac:'Lácteos',fru:'Fruta y verdura',gra:'Grasas y frutos secos',pla:'Platos y bocadillos',sup:'Batidos y suplementos'};
 // [nombre, kcal, proteína g, categoría] · valores aproximados por ración
 const FOODS = [
@@ -1344,7 +1380,7 @@ function dayTimeline(d){
   const its = dayItems(d), T = S.cfg.times, n = nOf(d), p = pace(d), now = nowMin(), t = TODAY();
   const ent = [];
   its.forEach(it => { if (it.type==='free') return; const tm = (it.type==='str'||it.type==='med') ? T.train : it.type==='pool' ? T.pool : T.walk; ent.push({tm, it}); });
-  MEALS.forEach(m => ent.push({tm: mealTime(m[0]), meal: m}));
+  MEALS.forEach(m => { if (m[0]==='mm' && !its.some(i=>i.type==='str') && !mealK(n||{}, 'mm')) return; ent.push({tm: mealTime(m[0]), meal: m}); });
   ent.sort((a,b)=>tmin(a.tm)-tmin(b.tm));
   const rest = its.some(i=>i.type==='free') && !its.some(i=>['str','pool','med'].includes(i.type));
   let h = `<div class="card"><div class="row sp"><h2>Tu día</h2><span class="chip">${PH[phaseOf(progWeek(d))].short}</span></div>
@@ -1635,14 +1671,15 @@ function fsList(){
   const q = (FS.search||'').trim().toLowerCase();
   const all = [...(S.cfg.foods||[]).map(f=>[f[0],f[1],f[2],'mine']), ...FOODS];
   if (q) return all.filter(f=>f[0].toLowerCase().includes(q)).slice(0,40);
+  if (FS.cat==='plan') return (PLATOS[FS.meal]||[]).map(x=>[x[0],x[1],x[2],'plan',x[3]]);
   if (FS.cat==='rec') return recentFoods();
   if (FS.cat==='mine') return (S.cfg.foods||[]).map(f=>[f[0],f[1],f[2],'mine']);
   return FOODS.filter(f=>f[3]===FS.cat);
 }
-function openFoodSheet(meal){ FS = {meal, q:1, cat: recentFoods().length ? 'rec' : 'des', search:''}; renderFoodSheet(); }
+function openFoodSheet(meal){ FS = {meal, q:1, cat: PLATOS[meal] ? 'plan' : recentFoods().length ? 'rec' : 'des', search:''}; renderFoodSheet(); }
 function renderFoodSheet(){
   const n = nOf(TODAY()), kk = mealK(n, FS.meal);
-  const cats = [['rec','Recientes'],['mine','Mis alimentos'],...Object.entries(FCAT)];
+  const cats = [...(PLATOS[FS.meal]?[['plan','Del plan']]:[]),['rec','Recientes'],['mine','Mis alimentos'],...Object.entries(FCAT)];
   modal(`<div class="row sp"><div><div class="eyebrow">${mealTime(FS.meal)}</div><h2 class="mt4">${esc(mealName(FS.meal))}</h2></div><div style="text-align:right"><div style="font-size:22px;font-weight:800;color:var(--food)" id="fsk">${kk}</div><div class="xs mu">kcal en esta toma</div></div></div>
     <input id="fsq" class="mt12" placeholder="Buscar alimento…" value="${esc(FS.search)}" autocomplete="off">
     <div class="seg mt8">${cats.map(([k,l])=>`<button class="${FS.cat===k&&!FS.search?'on':''}" data-act="fcat" data-v="${k}">${l}</button>`).join('')}</div>
@@ -1657,7 +1694,7 @@ function renderFoodSheet(){
 function foodRows(){
   FS.list = fsList();
   if (!FS.list.length) return `<div class="empty">${FS.cat==='mine'&&!FS.search?'Aún no has guardado alimentos propios. Añádelos a mano abajo.':FS.cat==='rec'&&!FS.search?'Aquí aparecerá lo que comas a menudo.':'Sin resultados. Añádelo a mano abajo.'}</div>`;
-  return FS.list.map((f,i)=>`<div class="frow"><div class="grow"><div class="sm b">${esc(f[0])}</div><div class="xs mu">${Math.round(f[1]*FS.q)} kcal · ${r1(f[2]*FS.q)} g prot${FS.q!==1?' (×'+String(FS.q).replace('.',',')+')':''}</div></div><button class="add" data-act="fadd" data-v="${i}">+</button></div>`).join('');
+  return FS.list.map((f,i)=>`<div class="frow"><div class="grow"><div class="sm b">${esc(f[0])}</div><div class="xs mu">${Math.round(f[1]*FS.q)} kcal · ${r1(f[2]*FS.q)} g prot${FS.q!==1?' (×'+String(FS.q).replace('.',',')+')':''}</div>${f[4]?`<div class="xs mu" style="margin-top:2px;line-height:1.35">${esc(f[4])}</div>`:''}</div><button class="add" data-act="fadd" data-v="${i}">+</button></div>`).join('');
 }
 function addFood(meal, f, q){
   const d = TODAY(), n = nutri(d); (n.items[meal] = n.items[meal] || []).push({n:f[0], k:f[1], p:f[2], q});
@@ -1726,7 +1763,7 @@ function viewCopia(){
       <label class="f">Nombre</label><input data-inp="pet.name" value="${esc(S.cfg.pet.name)}" maxlength="18">
       <label class="f">Peso meta para sus músculos (kg)</label><input inputmode="decimal" data-inp="pet.goalW" value="${S.cfg.pet.goalW||79}">
       <h3 class="mt16">Horarios de tu día</h3><p class="xs mu mt4">Ordenan la vista "Tu día" y el ritmo de calorías. Cámbialos cuando empieces a madrugar más.</p>
-      ${[['des','Desayuno'],['train','Entreno (L-X-V)'],['mm','Media mañana / post-entreno'],['pool','Piscina'],['com','Comida'],['walk','Paseo'],['mer','Merienda'],['cen','Cena'],['noc','Recena']].map(([k,l])=>`<div class="row sp mt8"><span class="sm">${l}</span><input type="time" data-inp="time.${k}" value="${S.cfg.times[k]}" style="width:120px"></div>`).join('')}
+      ${[['des','Desayuno'],['train','Entreno (L-X-V)'],['mm','Post-entreno (opcional)'],['pool','Piscina'],['com','Comida'],['walk','Paseo'],['mer','Merienda'],['cen','Cena'],['noc','Recena']].map(([k,l])=>`<div class="row sp mt8"><span class="sm">${l}</span><input type="time" data-inp="time.${k}" value="${S.cfg.times[k]}" style="width:120px"></div>`).join('')}
       <div class="kv mt12"><span class="mu">Semanas repetidas</span><b>${S.cfg.repeats||0}</b></div>
       <div class="kv"><span class="mu">Alta de readaptación</span><b>${S.cfg.alta?'Sí (bloque 3 desde sem. '+S.cfg.altaWeek+')':'No'}</b></div>
       <div class="btns">${S.cfg.repeats?'<button class="btn sm ghost" data-act="unrepeat">Deshacer última repetición</button>':''}${S.cfg.alta?'<button class="btn sm ghost" data-act="unalta">Anular alta</button>':''}</div></div>
