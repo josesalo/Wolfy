@@ -402,7 +402,7 @@ h1,h2,h3{color:var(--tx)}
 .pup.m-sleepy>.tl{animation-duration:3.2s}
 .pup.m-hungry>.tl,.pup.m-concerned>.tl{animation-duration:2.4s}
 .pup.m-proud>.tl,.pup.joy>.tl{animation-duration:.5s}
-.pup.joy .bd{animation:hop .7s cubic-bezier(.3,1.6,.5,1) 2}
+.pup.joy{animation:hop .7s cubic-bezier(.3,1.6,.5,1) 2;transform-origin:50% 100%}
 .pup .fx{position:absolute;pointer-events:none}
 .pup .fx.md{transform-origin:50% 0;animation:swing 3.6s ease-in-out infinite}
 @keyframes wag{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(9deg)}}
@@ -417,6 +417,8 @@ h1,h2,h3{color:var(--tx)}
 @media (prefers-reduced-motion:reduce){.pup>.tl,.pup .bd,.pup .fx.md{animation:none}}
 .hero.fp .scn{left:auto;right:10px;bottom:10px;z-index:2}
 .hero.fp .hud,.hero.fp .bubbles{z-index:2}
+
+.hoytop{padding-top:4px;min-height:0}.hoytop .mu{font-weight:650}
 
 </style>
 </head>
@@ -945,7 +947,8 @@ function day(d){ return S.days[d] || (S.days[d] = {date:d, updatedAt:0, sessions
 function saveDay(d){ const o = day(d); o.updatedAt = Date.now(); queueWrite('days/'+d, () => S.days[d]); }
 
 function setSync(s){ SYNC = s; const el = $('#syncchip'); if (el) el.outerHTML = syncChip(); }
-function syncChip(){
+function syncChip(show){
+  if (window.__PWA && !show) return '';
   const m = {cloud:['ok','☁︎ Guardado en tu cuenta'], local: window.__PWA ? ['ok','📱 Guardado en el iPhone'] : ['warn','Solo en este dispositivo'], connecting:['','Conectando…'], error:['bad','Sin conexión · guardado local']}[SYNC];
   return `<span id="syncchip" class="chip sync ${m[0]}" data-act="gosync">${m[1]}</span>`;
 }
@@ -1240,8 +1243,7 @@ function itemCard(it, d){
 /* ================== VISTA: HOY ================== */
 function viewHoy(){
   const d = TODAY(), w = progWeek(d), ph = phaseOf(w), m = mondayOf(d), c = (S.days[d]||{}).check;
-  let h = `<div class="top"><div><div class="eyebrow">${fmtDL(d)}</div><h1 class="mt4">${ph==='PRE'?'Preparado':'Semana '+w}</h1>
-    <div class="mu sm mt4">${ph==='PRE'?'Tu plan empieza el '+fmtDL(S.cfg.start):esc(PH[ph].name)}</div></div>${syncChip()}</div>`;
+  let h = `<div class="top hoytop"><div class="mu sm">${ph==='PRE'?'Tu plan empieza el '+fmtDL(S.cfg.start):'Semana '+w+' · '+esc(PH[ph].name)}</div>${syncChip()}</div>`;
   if (!S.cfg.pet.name) h += namingCard();
   else if (ph==='PRE') h += petHero('rest', 'happy', [['star','¡Empezamos el lunes!','pbub','data-v="pet"']]);
   else { const ps = petState(d); h += petHero(sceneOf(d), ps.mood, ps.bubbles); }
@@ -1635,7 +1637,7 @@ function viewEsp(){
 function viewCopia(){
   const n = Object.keys(S.days).length;
   return `<div class="card"><h3>Dónde se guardan tus datos</h3><p class="sm mt8">${SYNC==='cloud'?'En tu cuenta de Claude, asociados a esta app. Los ves desde cualquier dispositivo con tu sesión iniciada y Claude puede leerlos para tus revisiones.':(window.__PWA ? 'En este iPhone, dentro de la app Wolfy. No se sincronizan con otros dispositivos y se borran si eliminas la app de la pantalla de inicio: guarda una copia cada domingo.' : 'Ahora mismo, solo en este navegador. Safari puede borrar los datos de una web que no visitas en unos días: haz una copia cada semana.')}</p>
-    <div class="kv mt8"><span class="mu">Estado</span>${syncChip()}</div><div class="kv"><span class="mu">Días con registros</span><b>${n}</b></div></div>
+    <div class="kv mt8"><span class="mu">Estado</span>${syncChip(true)}</div><div class="kv"><span class="mu">Días con registros</span><b>${n}</b></div></div>
     <div class="card"><h3>Copia de seguridad</h3><p class="sm mu mt4">Recomendado cada domingo. Pega la copia en una nota o en un correo para ti.</p>
       <div class="btns"><button class="btn pri" data-act="exp-copy">Copiar copia</button>${DL||window.__PWA?'<button class="btn" data-act="exp-dl">Guardar archivo</button>':''}</div>${window.__PWA?`<p class="xs mu mt8">Última copia: ${lastBackup()?fmtDL(lastBackup()):'nunca'}. «Guardar archivo» abre el menú de compartir: elige «Guardar en Archivos» (iCloud Drive).</p>`:''}
       <label class="f">Restaurar: pega aquí una copia</label><textarea rows="3" id="imptxt" placeholder='{"app":"plan-jose",...}'></textarea>
@@ -2079,7 +2081,8 @@ async function boot(){
 }
 
 
-function petHearts(t){ const box = document.getElementById('hearts') || (t && t.closest && t.closest('.card')); if (!box) return;
+function petHearts(t){ return; /* sin iconos flotantes */
+   const box = document.getElementById('hearts') || (t && t.closest && t.closest('.card')); if (!box) return;
   for (let i=0;i<5;i++){ const h = document.createElement('i'); h.textContent = ['💜','✨','🐾','💜','⭐'][i]; h.style.left = (35+Math.random()*30)+'%'; h.style.animationDelay = (i*0.09)+'s'; box.appendChild(h); setTimeout(()=>h.remove(), 1600); } }
 
 /* ================== FITPUP: interfaz ================== */
