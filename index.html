@@ -2153,6 +2153,13 @@ function petName(){ return (S.cfg.pet && S.cfg.pet.name) || 'Wolfy'; }
 const SCENE_IMG = {gym:'bg_gym', pool:'bg_pool', rehab:'bg_rehab', rest:'bg_rehab', kitchen:'bg_food'};
 const SCENE_NAME = {gym:'Gym Terrace', pool:'Pool', rehab:'Rehab', rest:'Recovery', kitchen:'Nutrition'};
 // posición de la mascota en cada fondo: [centro x %, base %]
+// fondo según la hora: gym de día / atardecer; cocina desayuno / comida / cena
+function sceneImg(scene){
+  const t = nowMin();
+  if (scene==='gym') return (t >= 18*60 || t < 7*60) ? 'bg_gym_sunset' : 'bg_gym';
+  if (scene==='kitchen') return t < 13*60+30 ? 'bg_food_morning' : t < 20*60+30 ? 'bg_food' : 'bg_food_night';
+  return SCENE_IMG[scene];
+}
 const SCENE_POS = {gym:[37,97], pool:[23,99], rehab:[44,96], rest:[44,96], kitchen:[21,101]};
 const STAGE_H = [62,68,72,76,80]; // altura de la mascota (% del alto de la escena) por etapa
 const WEARABLE = ['sweatband','goggles','medal'];
@@ -2192,7 +2199,7 @@ function pupFig(stage, mood='neutral', worn=[], cls=''){
 function petHero(scene, mood, bubbles, opt={}){
   const st = opt.st || petStats(), nx = STAGES[st.stage+1], pos = SCENE_POS[scene];
   const look = S.cfg.pet.look && unlockedLooks(st).includes(S.cfg.pet.look);
-  return `<div class="hero fp" id="pethero"><img class="scene" src="${IMG(SCENE_IMG[scene])}" alt="" data-act="pettap">
+  return `<div class="hero fp" id="pethero"><img class="scene" src="${IMG(sceneImg(scene))}" alt="" data-act="pettap">
     <div class="pupat" data-act="pettap" style="left:${pos[0]}%;bottom:${100-pos[1]}%;height:${STAGE_H[st.stage]}%">${pupFig(st.stage, mood, wornAccs(st, scene))}</div>
     <div class="hud"><div class="nm" data-act="tab" data-v="prog"><img class="av" src="${look?avatarImg(st):IMG(STAGES[st.stage].img)}" alt=""><div><b>${esc(petName())}</b><div class="xs" style="color:var(--pet);font-weight:750">${STAGES[st.stage].n}${nx?` → ${nx.n}`:' · máx.'}</div><div class="lvbar"><i style="width:${Math.round(st.nextFrac*100)}%"></i></div></div></div>
 </div><span class="scn">${SCENE_NAME[scene]}</span>
