@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#D0DAE3">
 <title>Wolfy</title>
 <link rel="manifest" href="manifest.webmanifest">
-<script>window.__PWA=true;window.__BUILD="6d5a2439d5";</script>
+<script>window.__PWA=true;window.__BUILD="06ce5a3227";</script>
 <link rel="apple-touch-icon" sizes="180x180" href="img/wolfy-icon-180.png">
 <link rel="icon" type="image/png" href="img/wolfy-icon-512.png">
 <style>
@@ -150,7 +150,7 @@ details.tips li{margin-top:3px}
 #modal{position:fixed;inset:0;z-index:60;background:#01334866;display:none;align-items:flex-end;justify-content:center}
 #modal.on{display:flex}
 #modal .sheet{background:var(--s1);border-radius:24px 24px 0 0;width:100%;max-width:560px;max-height:88vh;overflow-y:auto;padding:18px 16px calc(var(--sab) + 18px)}
-#modal .grab{width:40px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 12px}
+#modal .grab{width:40px;height:5px;border-radius:9px;background:var(--line);margin:0 auto}
 .bar{height:8px;border-radius:9px;background:var(--s3);overflow:hidden}
 .bar i{display:block;height:100%;background:var(--acf);border-radius:9px}
 .bar.sw i{background:var(--sw)}.bar.med i{background:var(--med)}.bar.food i{background:var(--food)}
@@ -519,6 +519,11 @@ nav.tabs button.on{color:var(--klein)}
 .swres{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;background:#F5F8FB;border:0;border-radius:12px;padding:9px 12px;margin-top:6px}
 .swres b{font-size:14px;color:var(--tx)}
 
+#modal .shead{position:sticky;top:-18px;z-index:3;background:var(--s1);margin:-18px -16px 6px;padding:10px 16px 8px;display:flex;justify-content:center;align-items:center;min-height:44px}
+#modal .mx{position:absolute;right:10px;top:6px;width:36px;height:36px;border-radius:50%;border:0;background:#EEF1F4;color:#3D4245;display:grid;place-items:center}
+#modal .mx svg{width:18px;height:18px}
+#modal .mx:active{transform:scale(.92)}
+
 </style>
 </head>
 <body>
@@ -860,7 +865,9 @@ const RECETAS = {
 };
 function ingAmount(k, g){ const u = (ING[k]||[])[5]; if (u) { const n = g/u[2]; if (Math.abs(n*2 - Math.round(n*2)) < 0.05 && n >= 0.5) { const t = Number.isInteger(n) ? n : String(n).replace('.',','); return `${t} ${n===1?u[0]:u[1]}`; } } return `${Math.round(g)} ${['leche','cafe'].includes((ING[k]||[])[3])?'ml':'g'}`; }
 function recipeTotals(ings){ let k=0, p=0; ings.forEach(([key,g,cu])=>{ const f = cu || ING[key]; if (f) { k += f[1]*g/100; p += f[2]*g/100; } }); return {k:Math.round(k/5)*5, p:Math.round(p)}; }
-function recipeDesc(ings){ return ings.filter(([key])=>key!=='cafe').map(([key,g,cu])=>`${ingAmount(cu?null:key,g)} ${((cu||ING[key])[0]).toLowerCase()}`).join(' · '); }
+function recipeDesc(ings){ return ings.filter(([key])=>key!=='cafe').map(([key,g,cu])=>{ const nm = ((cu||ING[key])[0]).toLowerCase(), u = !cu && ING[key][5];
+  if (u && nm.split(' ')[0] === u[0]) { const n = g/u[2]; if (Math.abs(n*2-Math.round(n*2))<0.05 && n>=0.5) { const t = Number.isInteger(n)?n:String(n).replace('.',','); return `${t} ${n===1?nm:u[1]+nm.slice(u[0].length)}`; } }
+  return `${ingAmount(cu?null:key,g)} ${nm}`; }).join(' · '); }
 // Compatibilidad: PLATOS = [nombre, kcal, prot, detalle]
 const PLATOS = Object.fromEntries(Object.entries(RECETAS).map(([m,list])=>[m, list.map(r=>{ const t = recipeTotals(r[1]); return [r[0], t.k, t.p, recipeDesc(r[1]) + (r[2]?' · '+r[2]:'')]; })]));
 const FCAT = {des:'Desayuno',pro:'Proteínas',hid:'Hidratos',lac:'Lácteos',fru:'Fruta y verdura',gra:'Grasas y frutos secos',pla:'Platos y bocadillos',sup:'Batidos y suplementos'};
@@ -2020,7 +2027,13 @@ function timedEnd(full){
 }
 
 /* modal */
-function modal(html){ const m = $('#modal'); m.innerHTML = `<div class="sheet"><div class="grab"></div>${html}</div>`; m.classList.add('on'); }
+function modal(html){ const m = $('#modal'), keep = m.classList.contains('on') && m.querySelector('.sheet'), top = keep ? keep.scrollTop : 0;
+  m.innerHTML = `<div class="sheet"><div class="shead"><div class="grab"></div><button class="mx" data-act="mx" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button></div>${html}</div>`;
+  m.classList.add('on'); if (keep) m.querySelector('.sheet').scrollTop = top; }
+function dismissModal(){ if (typeof SW !== 'undefined') SW = null; FS = null; closeModal(); render(); }
+document.addEventListener('click', ev => { if (ev.target.id === 'modal') dismissModal(); });
+(function(){ let y0 = null; document.addEventListener('touchstart', ev => { const h = ev.target.closest && ev.target.closest('#modal .shead'); y0 = h ? ev.touches[0].clientY : null; }, {passive:true});
+  document.addEventListener('touchend', ev => { if (y0 != null && ev.changedTouches[0].clientY - y0 > 70) dismissModal(); y0 = null; }, {passive:true}); })();
 function closeModal(){ const m = $('#modal'); m.classList.remove('on'); m.innerHTML=''; }
 function toast(t){ const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(el._t); el._t = setTimeout(()=>el.classList.remove('on'), 1900); }
 
@@ -2177,6 +2190,7 @@ document.addEventListener('click', ev => {
     case 'reset': modal(`<h3>¿Borrar todo?</h3><p class="sm mt8">Se borran los datos de este dispositivo. ${DB?'Los guardados en tu cuenta se mantienen y volverán al recargar.':'Haz antes una copia de seguridad.'}</p><div class="btns"><button class="btn" style="background:var(--bad);color:#fff" data-act="resetok">Borrar</button><button class="btn ghost" data-act="mclose">Cancelar</button></div>`); break;
     case 'resetok': try{ localStorage.removeItem(LS); }catch(e){} S = {cfg:defCfg(), days:{}}; closeModal(); render(); break;
     case 'mclose': closeModal(); break;
+    case 'mx': dismissModal(); break;
     // runner
     case 'rclose': closeRunner(); render(); break;
     case 'variant': R.s.variant = v; renderRunner(); break;
