@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#D0DAE3">
 <title>Wolfy</title>
 <link rel="manifest" href="manifest.webmanifest">
-<script>window.__PWA=true;</script>
+<script>window.__PWA=true;window.__BUILD="d60260887a";</script>
 <link rel="apple-touch-icon" sizes="180x180" href="img/wolfy-icon-180.png">
 <link rel="icon" type="image/png" href="img/wolfy-icon-512.png">
 <style>
@@ -2491,7 +2491,14 @@ boot();
 
 </script>
 <script>
-if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').then(r=>{ window.__SWR=r; }).catch(()=>{}));
+// actualización automática: al volver a la app comprueba si hay versión nueva y recarga
+(function(){ let busy=false; async function chk(){ if (busy || !navigator.onLine) return; busy=true;
+  try { const r = await fetch('version.txt?t='+Date.now(), {cache:'no-store'}); const v = (await r.text()).trim();
+    if (v && window.__BUILD && v !== window.__BUILD) { let tried=''; try { tried = sessionStorage.getItem('wolfy_upd')||''; } catch(e){} if (tried !== v) { try { sessionStorage.setItem('wolfy_upd', v); } catch(e){} if (window.__SWR) { try { await window.__SWR.update(); } catch(e){} } location.reload(); return; } } } catch(e){}
+  busy=false; }
+  document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState==='visible') chk(); });
+  window.addEventListener('load', ()=>setTimeout(chk, 1500)); })();
 if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(()=>{});
 </script>
 </body>
