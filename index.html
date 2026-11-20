@@ -484,6 +484,16 @@ nav.tabs button.on{color:var(--klein)}
 .hero.fp .scene.front{pointer-events:none;z-index:1}
 .hero.fp .pupat{z-index:1}
 
+.wtabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#F3F5F7;border-radius:16px;padding:5px;margin-top:14px}
+.wtabs button{min-height:40px;border-radius:12px;font-size:13px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#A8A08C}
+.wtabs button.on{background:#fff;color:#3D4245;box-shadow:0 1px 4px rgba(61,66,69,.1)}
+.wr b{line-height:1.25}
+.wcore{margin-top:12px;padding:12px 4px 2px;border-top:1px solid #EEF0F2}
+.cores{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.cores div{background:#FBF8F7;border-radius:16px;padding:8px 4px 6px;text-align:center}
+.cores img{width:100%;max-width:106px;display:block;margin:0 auto}
+.cores span{display:block;font-size:13px;font-weight:700;color:#3D4245;margin-top:4px}
+
 </style>
 </head>
 <body>
@@ -1975,6 +1985,7 @@ document.addEventListener('click', ev => {
     case 'open': closeModal(); openSession(t.dataset.k, t.dataset.d, t.dataset.code); break;
     case 'petname': { const nm = ($('#petname').value||'').trim(); if (!nm) { toast('Escribe un nombre'); return; } S.cfg.pet.name = nm; saveCfg(); toast('¡Hola, '+nm+'!'); render(); break; }
     case 'splashgo': closeSplash(); break;
+    case 'wtab': WTAB = v; render(); break;
     case 'pettap': case 'pettap2': petHearts(t); pupJoy(); break;
     case 'look': { S.cfg.pet.look = v || null; saveCfg(); if (t.dataset.close) closeModal(); toast(v ? 'Look puesto' : 'Avatar de etapa'); render(); break; }
     case 'accinfo': { const a = ACCS.find(x=>x[0]===v); if (WEARABLE.includes(v)) { const eq = S.cfg.pet.equip; eq[v] = eq[v]===false; saveCfg(); toast(`${a[1]}: ${eq[v]===false?'guardado':'puesto'}${v==='goggles'?' (se ve en la piscina)':''}`); render(); } else toast(`${a[1]}: ${a[3]} ✓`); break; }
@@ -2446,13 +2457,25 @@ const MINI = {
   waist:'<svg viewBox="0 0 24 24"><path d="M4 9c2.5 2 13.5 2 16 0M4 15c2.5-2 13.5-2 16 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 5v14M9.5 7.5L12 5l2.5 2.5M9.5 16.5L12 19l2.5-2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   arm:'<svg viewBox="0 0 24 24"><path d="M4 17c3-.3 5-1.5 6.5-3.5L12 10c.8-1.8 2.4-3 4-3 1.8 0 3 1.2 3 2.8 0 1.4-1 2.4-2.4 2.6-1 .2-1.6.9-2 1.8-1.3 3-4 4.6-10.6 4.8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>'
 };
+let WTAB = 'det';
+function wolfyIdentity(){
+  return `<div class="wrows">
+      <div class="wr"><span>ESPECIE</span><b>Husky blanco · lobezno</b></div>
+      <div class="wr"><span>ROL</span><b>Tu compañero de entreno y nutrición</b></div>
+      <div class="wr"><span>CARÁCTER</span><b>Adorable · Sano · Motivador</b></div>
+      <div class="wr"><span>TEMA</span><b>Progreso · Hábito · Crecimiento</b></div>
+    </div>
+    <div class="wcore"><div class="eyebrow" style="text-align:left">Aspecto</div><div class="cores">
+      ${[['core_front','Frente'],['core_side','Perfil'],['core_back','Espalda']].map(([k,l])=>`<div><img src="${IMG(k)}" alt="${l}"><span>${l}</span></div>`).join('')}</div></div>`;
+}
 function wolfyCard(st){
   const w = lastVal(dd=>dd.check && dd.check.weight), wa = lastVal(dd=>dd.measures && dd.measures.cintura), ar = lastVal(dd=>dd.measures && dd.measures.brazo);
   const sk = streakInfo();
   const fig = S.cfg.pet.look && unlockedLooks(st).includes(S.cfg.pet.look) ? `<img class="avbig" src="${avatarImg(st)}" alt="" data-act="pettap2">` : `<div class="avbig2" data-act="pettap2">${pupFig(st.stage,'happy',wornAccs(st,'gym'))}</div>`;
   return `<div class="card wcard"><div class="wfig">${fig}</div>
     <div class="wname">${esc(petName())}</div><div class="wst">${STAGES[st.stage].n} · ${st.stage+1}/5</div>
-    <div class="wrows">
+    <div class="wtabs"><button class="${WTAB==='det'?'on':''}" data-act="wtab" data-v="det">Detalles</button><button class="${WTAB==='id'?'on':''}" data-act="wtab" data-v="id">Identidad</button></div>
+    ${WTAB==='id' ? wolfyIdentity() : `<div class="wrows">
       <div class="wr"><span>EDAD</span><b>${wolfyAge()}</b></div>
       <div class="wr"><span>RACHA</span><b>${sk.cur} ${sk.cur===1?'día':'días'}${sk.best?` · récord ${sk.best}`:''}</b></div>
       <div class="wr"><span>HUMANO</span><b>${esc(S.cfg.human||'Jose')}</b></div>
@@ -2462,7 +2485,7 @@ function wolfyCard(st){
       <span title="Cintura">${MINI.waist}${wa ? `${wa.v} cm` : '— cm'}</span>
       <span title="Brazo">${MINI.arm}${ar ? `${ar.v} cm` : '— cm'}</span>
     </div>
-    <div class="xs mu wfoot">${w ? `Peso del ${fmtD(w.d)}` : 'Aún sin pesarte con báscula'}${wa||ar ? ` · medidas del ${fmtD((wa||ar).d)}` : ' · añade medidas en Más → Cuerpo'}</div></div>`;
+    <div class="xs mu wfoot">${w ? `Peso del ${fmtD(w.d)}` : 'Aún sin pesarte con báscula'}${wa||ar ? ` · medidas del ${fmtD((wa||ar).d)}` : ' · añade medidas en Más → Cuerpo'}</div>`}</div>`;
 }
 boot();
 
