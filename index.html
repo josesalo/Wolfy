@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Wolfy">
-<meta name="theme-color" content="#EAF5FC">
+<meta name="theme-color" content="#D0DAE3">
 <title>Wolfy</title>
 <link rel="manifest" href="manifest.webmanifest">
 <script>window.__PWA=true;</script>
@@ -15,8 +15,8 @@
 <link rel="icon" type="image/png" href="img/wolfy-icon-512.png">
 <style>
 :root{
-  --bg:#FBF6F3;--s1:#FFFFFF;--s2:#F5F9FC;--s3:#E9F2F8;--line:#E2ECF3;
-  --tx:#013348;--mu:#5B7486;--mu2:#9BAFBE;
+  --bg:#D0DAE3;--s1:#FFFFFF;--s2:#F0F2F4;--s3:#E5EAEF;--line:#C7D1DA;
+  --tx:#3D4245;--mu:#71767C;--mu2:#9AA0A6;--klein:#002FA7;
   --ac:#1586BF;--acf:#38B7EA;--acd:#38B7EA1F;--acl:#57B7E7;
   --med:#3C9A55;--medd:#B3E9A740;--sw:#0C9CC6;--swd:#59DCFB2B;
   --food:#E2705F;--foodd:#FEBAB140;--warn:#B88A1C;--warnd:#FEDC8955;--bad:#D64343;--badd:#D6434316;--ok:#3C9A55;--okd:#B3E9A740;
@@ -383,7 +383,7 @@ a{color:var(--ac)}
 
 /* ===== FitPup v5 · mascota animada por capas ===== */
 .btn.petb{background:linear-gradient(180deg,#57B7E7,#38B7EA);color:#013348;border-color:#38B7EA}
-h1,h2,h3{color:var(--tx)}
+h1,h2,h3{color:var(--klein)}
 .hero.fp{background:#EAF6FC;aspect-ratio:1487/1058}
 .hero.fp .scene{animation:none}
 .pupat{position:absolute;transform:translateX(-50%);cursor:pointer;z-index:1;display:flex;align-items:flex-end}
@@ -419,6 +419,62 @@ h1,h2,h3{color:var(--tx)}
 .hero.fp .hud,.hero.fp .bubbles{z-index:2}
 
 .hoytop{padding-top:4px;min-height:0}.hoytop .mu{font-weight:650}
+
+/* ===== v6 · paleta gris (estilo Finch) + títulos Klein ===== */
+html,body{background:var(--bg)}
+h1{font-size:31px;letter-spacing:-.6px}
+h2{font-size:22px}
+h3{font-size:18px;font-weight:780}
+.card{border-color:transparent;box-shadow:0 1px 0 rgba(61,66,69,.04),0 6px 18px rgba(61,66,69,.07)}
+.eyebrow{color:#3D4245;letter-spacing:1.6px}
+nav.tabs{background:#F0F0F0EE;border-top-color:#C7D1DA}
+nav.tabs button.on{color:var(--klein)}
+.hoytop .mu{color:#3D4245}
+.fpcard{background:#fff;border-color:transparent}
+/* ficha de Wolfy */
+.wcard{text-align:center;padding-bottom:12px}
+.wfig{background:linear-gradient(180deg,#E6F2FA,#F5F9FC);border-radius:20px;padding:8px 0 2px;margin:-4px -4px 10px}
+.wcard .avbig2{margin:0 auto}
+.wname{font-size:26px;font-weight:850;color:var(--klein);letter-spacing:-.4px}
+.wst{font-size:13px;color:var(--mu);font-weight:650;margin-top:2px}
+.wrows{margin-top:14px;text-align:left}
+.wr{display:grid;grid-template-columns:110px 1fr;align-items:center;padding:7px 4px}
+.wr span{font-size:12.5px;letter-spacing:1.6px;font-weight:750;color:#A8A08C}
+.wr b{font-size:17px;font-weight:700;color:#3D4245}
+.wstats{display:flex;justify-content:space-between;gap:8px;margin-top:10px;padding:12px 4px 4px;border-top:1px solid #EEF0F2}
+.wstats span{display:flex;align-items:center;gap:6px;font-size:16.5px;color:#8E887A;font-weight:600}
+.wstats svg{width:22px;height:22px;color:#A8A08C}
+.wfoot{margin-top:8px;text-align:left;padding:0 4px}
+/* pantalla diaria */
+.splash{position:fixed;inset:0;z-index:100;background:#3E86C9;color:#fff;display:flex;flex-direction:column;align-items:center;overflow:hidden;animation:spIn .35s ease-out both;padding:calc(var(--sat) + 18px) 22px calc(var(--sab) + 22px)}
+.splash.out{animation:spOut .35s ease-in forwards}
+@keyframes spIn{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
+@keyframes spOut{to{opacity:0;transform:scale(.97)}}
+.splash .rays{position:absolute;left:50%;top:34%;width:240vmax;height:240vmax;margin:-120vmax 0 0 -120vmax;background:repeating-conic-gradient(from 0deg,#57B7E7 0deg 9deg,#4AA8DE 9deg 18deg);animation:spin 60s linear infinite;opacity:.95}
+.splash .rays::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.55) 0,rgba(255,255,255,.12) 9%,rgba(62,134,201,0) 26%,rgba(46,110,180,.5) 55%)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sp-in{position:relative;flex:1;width:100%;max-width:440px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.sp-date{font-size:15px;font-weight:800;letter-spacing:2px;text-transform:uppercase;opacity:.92}
+.sp-pup{height:min(34vh,290px);display:flex;justify-content:center;margin-top:10px}
+.sp-pup .pup{filter:drop-shadow(0 14px 10px rgba(0,30,80,.25))}
+.sp-num{font-size:104px;line-height:1;font-weight:900;margin-top:12px;color:#fff;text-shadow:0 5px 0 #002FA7,0 0 0 #002FA7;-webkit-text-stroke:5px #002FA7;paint-order:stroke fill;animation:numPop .6s .25s cubic-bezier(.2,1.7,.4,1) both}
+@keyframes numPop{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
+.sp-lbl{font-size:30px;font-weight:900;letter-spacing:.5px;margin-top:6px}
+.sp-week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;width:100%;margin-top:24px;background:rgba(0,47,167,.28);border-radius:26px;padding:14px 10px}
+.sd{display:flex;flex-direction:column;align-items:center;gap:10px}
+.sl{font-size:15px;font-weight:800}
+.sd i{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(0,30,90,.32);font-style:normal}
+.sd i.ok{background:#fff;color:#002FA7;animation:numPop .5s cubic-bezier(.2,1.7,.4,1) both}
+.sd i.ok svg{width:22px;height:22px}
+.sd i.now{background:rgba(255,255,255,.25);box-shadow:0 0 0 3px rgba(255,255,255,.85),0 0 16px 4px rgba(255,255,255,.55);animation:glow 1.6s ease-in-out infinite}
+.sd i.fut{opacity:.7}
+@keyframes glow{50%{box-shadow:0 0 0 3px #fff,0 0 22px 8px rgba(255,255,255,.75)}}
+.sp-msg{font-size:18px;font-weight:700;text-align:center;line-height:1.35;margin-top:22px;max-width:380px}
+.sp-msg b{font-weight:900}
+.sp-foot{font-size:13px;opacity:.85;text-align:center;margin-top:8px}
+.sp-btn{position:relative;width:100%;max-width:440px;min-height:58px;border-radius:20px;background:#fff;color:#002FA7;font-size:19px;font-weight:850;box-shadow:0 5px 0 rgba(0,30,90,.35)}
+.sp-btn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,30,90,.35)}
+@media (max-height:700px){.sp-num{font-size:80px}.sp-pup{height:26vh}.sp-week{margin-top:14px}}
 
 </style>
 </head>
@@ -1910,6 +1966,7 @@ document.addEventListener('click', ev => {
     case 'walk': { const dd = day(t.dataset.d); dd.walk = Math.max(0,(dd.walk||0) + (+v)); saveDay(t.dataset.d); render(); break; }
     case 'open': closeModal(); openSession(t.dataset.k, t.dataset.d, t.dataset.code); break;
     case 'petname': { const nm = ($('#petname').value||'').trim(); if (!nm) { toast('Escribe un nombre'); return; } S.cfg.pet.name = nm; saveCfg(); toast('¡Hola, '+nm+'!'); render(); break; }
+    case 'splashgo': closeSplash(); break;
     case 'pettap': case 'pettap2': petHearts(t); pupJoy(); break;
     case 'look': { S.cfg.pet.look = v || null; saveCfg(); if (t.dataset.close) closeModal(); toast(v ? 'Look puesto' : 'Avatar de etapa'); render(); break; }
     case 'accinfo': { const a = ACCS.find(x=>x[0]===v); if (WEARABLE.includes(v)) { const eq = S.cfg.pet.equip; eq[v] = eq[v]===false; saveCfg(); toast(`${a[1]}: ${eq[v]===false?'guardado':'puesto'}${v==='goggles'?' (se ve en la piscina)':''}`); render(); } else toast(`${a[1]}: ${a[3]} ✓`); break; }
@@ -2076,6 +2133,7 @@ async function boot(){
   loadLocal();
   if (!S.cfg.updatedAt) { S.cfg.updatedAt = 1; saveLocal(); }
   render();
+  maybeSplash();
   initCloud();
   if (window.claude && typeof window.claude.use==='function') { try { DL = await withTimeout(window.claude.use('downloads'), 11000); } catch(e){ DL = null; } if (DL && TAB==='mas') render(); }
 }
@@ -2147,8 +2205,7 @@ function namingCard(){
 /* evolución */
 function evolutionSection(){
   const st = petStats(), ms = st.ms, un = unlockedAccs(st), lk = unlockedLooks(st), dbs = unlockedDBs(st), sp = unlockedSpecials(st), nx = STAGES[st.stage+1];
-  let h = `<div class="card fpcard" style="text-align:center"><div class="eyebrow" style="color:var(--pet)">Your Progress, Their Evolution</div>
-    ${S.cfg.pet.look && unlockedLooks(st).includes(S.cfg.pet.look) ? `<img class="avbig" src="${avatarImg(st)}" alt="" data-act="pettap2">` : `<div class="avbig2" data-act="pettap2">${pupFig(st.stage,'happy',wornAccs(st,'gym'))}</div>`}<h2 style="color:var(--pet)">${esc(petName())} · ${STAGES[st.stage].n}</h2><p class="sm mu mt4">${STAGES[st.stage].txt}</p></div>`;
+  let h = wolfyCard(st);
   // etapas
   h += `<div class="card"><h3>Evolution: Grow Together</h3><div class="stages">${STAGES.map((s,i)=>`<div class="stg ${i<=st.stage?'':'locked'} ${i===st.stage?'cur':''}"><img src="${IMG(s.img)}" alt=""><div class="sn">${i+1} · ${s.n}</div></div>`).join('')}</div>
     ${nx ? `<div class="mt12"><div class="sm b">Para llegar a ${nx.n} necesitas los tres pilares:</div>
@@ -2297,6 +2354,95 @@ function dayDetail(d){
     <div class="btns"><button class="btn" data-act="toweek" data-v="${d}">Ver semana</button>${d===t?'<button class="btn pri" data-act="tab" data-v="hoy">Ir a hoy</button>':''}</div>`);
 }
 
+
+
+/* ================== RACHA + PANTALLA DIARIA ================== */
+function actDay(d){ const dd = S.days[d]; return !!dd && (!!(dd.check && dd.check.saved) || Object.values(dd.sessions||{}).some(isDone)); }
+function streakInfo(){
+  const t = TODAY(), todayAct = actDay(t);
+  let cur = 0, d = todayAct ? t : addDays(t,-1);
+  while (actDay(d)) { cur++; d = addDays(d,-1); }
+  // racha anterior (si la de ayer se rompió)
+  let prev = 0;
+  if (!cur) { let k = addDays(t,-2), n = 0; while (n < 60 && !actDay(k)) { k = addDays(k,-1); n++; } while (actDay(k)) { prev++; k = addDays(k,-1); } }
+  return {cur, todayAct, prev, best: petStats().bestDays};
+}
+const WD1 = ['L','M','X','J','V','S','D'];
+const WDN = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+function todayLine(d){
+  const w = progWeek(d), ph = phaseOf(w);
+  if (ph==='PRE') return `Empezamos el ${fmtDL(S.cfg.start)}. Hoy toca preparar el material y descansar.`;
+  const its = dayItems(d), st = its.find(i=>i.type==='str'), pool = its.find(i=>i.type==='pool' && !i.optional), med = its.find(i=>i.type==='med');
+  if (st) return `Hoy toca <b>${W[st.kind].name}</b> · ${esc(W[st.kind].sub)}.`;
+  if (pool) return `Hoy toca <b>piscina</b>: ${SWIM[pool.code].m} m tranquilos.`;
+  if (med) return `Hoy toca <b>movilidad</b> y un paseo.`;
+  return `Día libre: descansa, come bien y duerme.`;
+}
+function splashHTML(){
+  const t = TODAY(), s = streakInfo(), n = s.todayAct ? s.cur : s.cur + 1, m = mondayOf(t), st = petStats();
+  const dots = WD1.map((l,i)=>{ const d = addDays(m,i), done = actDay(d), isT = d===t, fut = d > t;
+    return `<div class="sd"><span class="sl">${l}</span><i class="${done?'ok':isT?'now':fut?'fut':'miss'}">${done?'<svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}</i></div>`; }).join('');
+  let msg = todayLine(t);
+  if (!s.cur && s.prev >= 2) msg = `Tu racha de ${s.prev} días terminó, pero hoy vuelves. ¿A por el récord de ${s.best}?<br>` + msg;
+  else if (s.cur && s.cur + (s.todayAct?0:1) > s.best && s.best >= 3) msg = `¡Nuevo récord de constancia!<br>` + msg;
+  const foot = s.todayAct ? 'Hoy ya cuenta. ¡Sigue así!' : 'El día cuenta cuando haces el check-in o un entreno.';
+  const wd = new Date(t+'T12:00:00').getDay();
+  return `<div class="splash" id="splash"><div class="rays"></div>
+    <div class="sp-in">
+      <div class="sp-date">${WDN[wd]} ${fmtD(t)}</div>
+      <div class="sp-pup">${pupFig(st.stage,'happy',wornAccs(st,'gym'),'joy')}</div>
+      <div class="sp-num">${n}</div>
+      <div class="sp-lbl">${n===1?'DÍA SEGUIDO':'DÍAS SEGUIDOS'}</div>
+      <div class="sp-week">${dots}</div>
+      <p class="sp-msg">${msg}</p>
+      <p class="sp-foot">${foot}</p>
+    </div>
+    <button class="sp-btn" data-act="splashgo">¡Vamos!</button></div>`;
+}
+function maybeSplash(force){
+  if (window.__NOSPLASH && !force) return;
+  let seen = ''; try { seen = localStorage.getItem('wolfy_splash')||''; } catch(e){}
+  if (!force && seen === TODAY()) return;
+  try { localStorage.setItem('wolfy_splash', TODAY()); } catch(e){}
+  const box = document.createElement('div'); box.innerHTML = splashHTML(); document.body.appendChild(box.firstChild);
+  document.body.style.overflow = 'hidden';
+  setTimeout(()=>{ const p = document.querySelector('#splash .pup'); if (p) p.classList.remove('joy'); }, 1500);
+}
+function closeSplash(){ const el = document.getElementById('splash'); if (!el) return; el.classList.add('out'); document.body.style.overflow=''; setTimeout(()=>el.remove(), 380); }
+document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState==='visible' && S && S.cfg) maybeSplash(); });
+
+/* ================== FICHA DE WOLFY (estilo "Details") ================== */
+function lastVal(fn){ const ks = Object.keys(S.days).filter(k=>k<=TODAY()).sort().reverse(); for (const k of ks){ const v = fn(S.days[k]); if (v!=null && v!=='') return {v, d:k}; } return null; }
+function wolfyAge(){
+  const t = TODAY(), st = S.cfg.start; if (t < st) return `Nace el ${fmtDL(st)}`;
+  const dd = diffDays(st, t) + 1;
+  if (dd < 14) return `${dd} ${dd===1?'día':'días'}`;
+  if (dd < 61) return `${Math.floor(dd/7)} semanas`;
+  const mo = Math.floor(dd/30.44); return `${mo} ${mo===1?'mes':'meses'}`;
+}
+const MINI = {
+  kg:'<svg viewBox="0 0 24 24"><path d="M5 8h14l1.6 11.2a1 1 0 0 1-1 1.1H4.4a1 1 0 0 1-1-1.1Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 13.5l1.4-1.6M9 8a3 3 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  waist:'<svg viewBox="0 0 24 24"><path d="M4 9c2.5 2 13.5 2 16 0M4 15c2.5-2 13.5-2 16 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 5v14M9.5 7.5L12 5l2.5 2.5M9.5 16.5L12 19l2.5-2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  arm:'<svg viewBox="0 0 24 24"><path d="M4 17c3-.3 5-1.5 6.5-3.5L12 10c.8-1.8 2.4-3 4-3 1.8 0 3 1.2 3 2.8 0 1.4-1 2.4-2.4 2.6-1 .2-1.6.9-2 1.8-1.3 3-4 4.6-10.6 4.8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>'
+};
+function wolfyCard(st){
+  const w = lastVal(dd=>dd.check && dd.check.weight), wa = lastVal(dd=>dd.measures && dd.measures.cintura), ar = lastVal(dd=>dd.measures && dd.measures.brazo);
+  const sk = streakInfo();
+  const fig = S.cfg.pet.look && unlockedLooks(st).includes(S.cfg.pet.look) ? `<img class="avbig" src="${avatarImg(st)}" alt="" data-act="pettap2">` : `<div class="avbig2" data-act="pettap2">${pupFig(st.stage,'happy',wornAccs(st,'gym'))}</div>`;
+  return `<div class="card wcard"><div class="wfig">${fig}</div>
+    <div class="wname">${esc(petName())}</div><div class="wst">${STAGES[st.stage].n} · etapa ${st.stage+1} de 5</div>
+    <div class="wrows">
+      <div class="wr"><span>EDAD</span><b>${wolfyAge()}</b></div>
+      <div class="wr"><span>RACHA</span><b>${sk.cur} ${sk.cur===1?'día':'días'}${sk.best?` · récord ${sk.best}`:''}</b></div>
+      <div class="wr"><span>HUMANO</span><b>${esc(S.cfg.human||'Jose')}</b></div>
+    </div>
+    <div class="wstats">
+      <span title="Último peso">${MINI.kg}${w ? `${w.v} kg` : `~${S.cfg.bw} kg`}</span>
+      <span title="Cintura">${MINI.waist}${wa ? `${wa.v} cm` : '— cm'}</span>
+      <span title="Brazo">${MINI.arm}${ar ? `${ar.v} cm` : '— cm'}</span>
+    </div>
+    <div class="xs mu wfoot">${w ? `Peso del ${fmtD(w.d)}` : 'Aún sin pesarte con báscula'}${wa||ar ? ` · medidas del ${fmtD((wa||ar).d)}` : ' · añade medidas en Más → Cuerpo'}</div></div>`;
+}
 boot();
 
 </script>

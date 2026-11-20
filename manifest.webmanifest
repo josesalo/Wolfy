@@ -7,8 +7,8 @@
  "scope": "./",
  "display": "standalone",
  "orientation": "portrait",
- "background_color": "#FBF6F3",
- "theme_color": "#EAF6FC",
+ "background_color": "#D0DAE3",
+ "theme_color": "#D0DAE3",
  "icons": [
   {
    "src": "img/wolfy-icon-192.png",
