@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#D0DAE3">
 <title>Wolfy</title>
 <link rel="manifest" href="manifest.webmanifest">
-<script>window.__PWA=true;window.__BUILD="5191ac60bb";</script>
+<script>window.__PWA=true;window.__BUILD="6d5a2439d5";</script>
 <link rel="apple-touch-icon" sizes="180x180" href="img/wolfy-icon-180.png">
 <link rel="icon" type="image/png" href="img/wolfy-icon-512.png">
 <style>
@@ -505,6 +505,20 @@ nav.tabs button.on{color:var(--klein)}
 .menucard[open] summary::after{transform:rotate(-135deg)}
 .menucard[open] summary{margin-bottom:6px}
 
+.lnk{background:none;border:0;padding:6px 0 0;color:var(--klein);font-size:13px;font-weight:750;min-height:30px}
+.swtot{display:grid;grid-template-columns:1fr 1fr 1.1fr;gap:8px;margin-top:12px;background:#F3F5F7;border-radius:16px;padding:12px}
+.swtot b{font-size:24px;font-weight:850;color:var(--klein)}.swtot span{font-size:13px;color:var(--mu);font-weight:650}
+.swtot .up{color:#2F7D4F;font-weight:750}.swtot .dn{color:#B07A12;font-weight:750}
+.swrow{display:grid;grid-template-columns:1fr 92px 30px;grid-template-areas:"n g x" "v v v";gap:4px 8px;align-items:center;padding:9px 0;border-bottom:1px solid #EEF0F2}
+.swrow select,.swrow .swname{grid-area:n;min-width:0;font-size:14.5px;font-weight:650;color:var(--tx)}
+.swrow select{min-height:40px;border-radius:12px;border:1px solid var(--line);background:#fff;padding:0 8px}
+.swrow .swname{padding-left:4px}
+.swg{grid-area:g;display:flex;align-items:center;gap:4px}.swg input{width:62px;min-height:40px;text-align:right;padding:0 8px}.swg span{font-size:12px;color:var(--mu)}
+.swv{grid-area:v;padding-left:4px}
+.swdel{grid-area:x;width:30px;height:30px;border-radius:50%;background:#F0F2F4;border:0;color:var(--mu);font-size:18px;line-height:1}
+.swres{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;background:#F5F8FB;border:0;border-radius:12px;padding:9px 12px;margin-top:6px}
+.swres b{font-size:14px;color:var(--tx)}
+
 </style>
 </head>
 <body>
@@ -778,42 +792,77 @@ const MEALS = [
   ['cen','Cena','22:15',0.23],
   ['noc','Recena (comodín)','00:30',0],
 ];
-// Platos del plan de nutrición (20 nov 2026): [nombre, kcal, g proteína, detalle] · valores aproximados
-const PLATOS = {
+// Ingredientes por 100 g/ml: [nombre, kcal, g proteína, grupo, ración por defecto (g), unidad [singular, plural, g]] · valores orientativos
+const ING = {
+  pollo_pech:['Pechuga de pollo',110,23,'prot',150], pollo_contra:['Contramuslo de pollo',145,19,'prot',150], pollo_asado:['Pollo asado',190,27,'prot',120],
+  ternera:['Ternera (filete)',130,21,'prot',150], picada:['Carne picada mixta',250,17,'prot',150], cerdo_lomo:['Lomo de cerdo',150,22,'prot',150],
+  pavo_carne:['Pechuga de pavo',105,24,'prot',150], salmon:['Salmón',200,20,'prot',150], merluza:['Merluza',75,17,'prot',180],
+  atun_nat:['Atún al natural (escurrido)',110,25,'prot',80,['lata','latas',56]], atun_ac:['Atún en aceite (escurrido)',200,25,'prot',80,['lata','latas',56]],
+  gambas:['Gambas',85,18,'prot',150], tofu:['Tofu firme',145,15,'prot',150], huevo:['Huevo',145,12.5,'prot',120,['huevo','huevos',60]],
+  fiambre_pavo:['Pavo (fiambre)',100,18,'fiam',60], jamon_cocido:['Jamón cocido',110,19,'fiam',60], jamon_serrano:['Jamón serrano',240,30,'fiam',50],
+  lomo_emb:['Lomo embuchado',255,38,'fiam',40], queso_lonchas:['Queso en lonchas',340,25,'queso',40], queso_fresco:['Queso fresco',180,12,'queso',80],
+  queso_rallado:['Queso rallado',380,28,'queso',30], mozzarella:['Mozzarella',250,18,'queso',60],
+  pan_barra:['Pan (barra)',270,9,'pan',100], pan_molde:['Pan de molde integral',250,10,'pan',100,['rebanada','rebanadas',30]], pan_centeno:['Pan de centeno',250,8,'pan',100],
+  tortilla_trigo:['Tortilla de trigo',300,8.5,'pan',120,['tortilla','tortillas',30]],
+  arroz_seco:['Arroz (peso seco)',355,7,'hc',100], arroz_micro:['Arroz de microondas',155,3,'hc',250,['vaso','vasos',125]],
+  fideos_huevo:['Fideos de huevo / udon (seco)',360,12,'hc',100], fideos_arroz:['Fideos de arroz (seco)',360,6,'hc',100], ramen_seco:['Fideos ramen (seco)',360,10,'hc',100],
+  pasta:['Pasta (peso seco)',355,12.5,'hc',100], patata:['Patata',80,2,'hc',350], boniato:['Boniato',86,1.6,'hc',300], quinoa:['Quinoa (seco)',360,14,'hc',90], cuscus:['Cuscús (seco)',360,12.5,'hc',90],
+  avena:['Copos de avena',375,13,'avena',50],
+  leche_entera:['Leche entera',64,3.2,'leche',250], leche_semi:['Leche semidesnatada',47,3.2,'leche',250], leche_desn:['Leche desnatada',35,3.4,'leche',250],
+  bebida_soja:['Bebida de soja',40,3.3,'leche',250], bebida_avena:['Bebida de avena',45,0.5,'leche',250],
+  yog_prot:['Yogur proteico',60,10,'yog',200,['yogur','yogures',200]], yog_griego:['Yogur griego',130,4,'yog',125,['yogur','yogures',125]],
+  skyr:['Skyr',63,11,'yog',150], queso_batido:['Queso fresco batido 0 %',46,8,'yog',250],
+  whey:['Whey isolate',372,88,'sup',25,['cacito','cacitos',25]], gainer:['Origin Mass Gainer',365,18.2,'sup',137,['ración','raciones',274]],
+  platano:['Plátano',90,1.1,'fruta',120,['plátano','plátanos',120]], manzana:['Manzana',52,0.3,'fruta',150,['manzana','manzanas',150]], frutos_rojos:['Frutos rojos',45,1,'fruta',100],
+  nueces:['Nueces',680,15,'fs',20], almendras:['Almendras',600,21,'fs',20], frutos_secos:['Frutos secos variados',610,18,'fs',30], cacahuete_crema:['Crema de cacahuete',600,25,'fs',15],
+  aove:['Aceite de oliva',900,0,'grasa',10,['cda','cdas',10]], aceite_sesamo:['Aceite de sésamo',900,0,'grasa',10,['cda','cdas',10]], mantequilla:['Mantequilla',740,0.7,'grasa',10],
+  aguacate:['Aguacate',160,2,'grasa',70], hummus:['Hummus',300,8,'salsa',60], guacamole:['Guacamole',150,1.5,'salsa',50], mayonesa:['Mayonesa',680,1,'salsa',15], mayo_sriracha:['Mayonesa sriracha',600,1,'salsa',15],
+  salsa_soja:['Salsa de soja',60,8,'cond',15], miso:['Miso',200,12,'cond',15], sesamo:['Semillas de sésamo',570,18,'cond',10],
+  edamame:['Edamame',120,11,'verd',50], verdura_wok:['Verdura para wok',35,2,'verd',150], verduras_mix:['Lechuga y zanahoria',30,1.2,'verd',100], brotes_soja:['Brotes de soja',30,3,'verd',40],
+  tomate:['Tomate',20,1,'verd',30], tomate_trit:['Tomate triturado',30,1.4,'verd',100], espinacas:['Espinacas',23,3,'verd',50], maiz:['Maíz dulce',85,3,'verd',40],
+  cafe:['Café',2,0.2,'cafe',50],
+};
+// Platos del plan (20 nov 2026): [nombre, [[ingrediente, gramos]...], nota] · totales calculados de los ingredientes
+const RECETAS = {
   des:[
-    ['Tostadas de pavo y queso',710,39,'Café con leche (250 ml) · 100 g de pan · 1 cda AOVE · 60 g pavo · 40 g queso'],
-    ['Tostadas de jamón + yogur proteico',750,52,'Café con leche · 100 g de pan con tomate y 1 cda AOVE · 50 g jamón · 1 yogur proteico'],
-    ['Bol de yogur con avena',740,45,'Café con leche · 1 yogur proteico + 1 griego · 50 g avena · 1 plátano · 20 g nueces'],
-    ['Batido de desayuno (sin hambre)',665,44,'Café · 300 ml leche · 1 cacito whey · 50 g avena · 1 plátano · 15 g crema de cacahuete'],
+    ['Tostadas de pavo y queso',[['cafe',50],['leche_entera',200],['pan_barra',100],['aove',10],['fiambre_pavo',60],['queso_lonchas',40]]],
+    ['Tostadas de jamón + yogur proteico',[['cafe',50],['leche_entera',200],['pan_barra',100],['tomate',30],['aove',10],['jamon_serrano',50],['yog_prot',200]]],
+    ['Bol de yogur con avena',[['cafe',50],['leche_entera',200],['yog_prot',200],['avena',50],['platano',120],['nueces',20]]],
+    ['Batido de desayuno (sin hambre)',[['cafe',50],['leche_entera',300],['whey',25],['avena',50],['platano',120],['cacahuete_crema',15]]],
   ],
   mm:[
-    ['Batido post-entreno',255,30,'250 ml leche semidesnatada · 1 cacito whey. Ese día, merienda sin whey'],
-    ['Yogur proteico + plátano',220,21,'1 yogur proteico · 1 plátano'],
+    ['Batido post-entreno',[['leche_semi',250],['whey',25]],'Ese día, merienda sin whey'],
+    ['Yogur proteico + plátano',[['yog_prot',200],['platano',120]]],
   ],
   com:[
-    ['Noodles salteados con pollo',900,50,'100 g fideos (peso seco) · 150 g contramuslo · 150 g verdura de wok · 1 huevo · 1 cda aceite · soja, ajo, jengibre · sésamo'],
-    ['Ramen rápido',850,55,'100 g fideos ramen · caldo + soja/miso · 2 huevos · 120 g lomo o pollo ya hecho · cebolleta, maíz, espinacas · 1 cda aceite de sésamo o chile'],
-    ['Poke bowl fácil',950,45,'2 vasos de arroz de microondas · 150 g salmón (o 2 latas de atún) · ½ aguacate · 50 g edamame · pepino y zanahoria · soja + 15 g mayo-sriracha · sésamo'],
-    ['Tacos fríos de pollo especiado',860,54,'4 tortillas de trigo · 180 g pollo con especias y 1 cda aceite · 60 g hummus · lechuga, zanahoria, brotes de soja'],
-    ['Plato casero (carne + arroz/patata)',880,43,'150 g carne · 100 g arroz (seco) o 350 g patata · 1 cda AOVE · verdura · 40 g pan'],
+    ['Noodles salteados con pollo',[['fideos_huevo',100],['pollo_contra',150],['verdura_wok',150],['huevo',60],['aove',10],['salsa_soja',15],['sesamo',10]],'Ajo y jengibre al gusto'],
+    ['Ramen rápido',[['ramen_seco',100],['huevo',120],['cerdo_lomo',120],['miso',15],['salsa_soja',15],['espinacas',50],['maiz',40],['aceite_sesamo',10]],'Carne ya hecha; cebolleta al gusto'],
+    ['Poke bowl fácil',[['arroz_micro',250],['salmon',130],['aguacate',70],['edamame',50],['verduras_mix',80],['salsa_soja',15],['mayo_sriracha',15],['sesamo',5]]],
+    ['Tacos fríos de pollo especiado',[['tortilla_trigo',120],['pollo_pech',180],['aove',10],['hummus',60],['verduras_mix',100],['brotes_soja',40]]],
+    ['Plato casero (carne + arroz)',[['ternera',150],['arroz_seco',100],['aove',15],['verdura_wok',150],['pan_barra',40]]],
   ],
   mer:[
-    ['Batido casero denso',645,43,'400 ml leche entera · 1 cacito whey · 50 g avena · plátano aparte. Va en un shaker'],
-    ['½ ración de gainer con leche',695,35,'137 g Origin Mass Gainer (≈500 kcal, 25 g prot, 2,5 g creatina) · 300 ml leche'],
-    ['Bocadillo + yogur + frutos secos',675,52,'80 g pan con 60 g pavo y 30 g queso · 1 yogur proteico · 30 g frutos secos'],
+    ['Batido casero denso',[['leche_entera',400],['whey',25],['avena',50],['platano',120]],'Plátano aparte; todo en un shaker'],
+    ['½ ración de gainer con leche',[['gainer',137],['leche_entera',300]],'Lleva 2,5 g de creatina: ese día, 2,5 g sueltos'],
+    ['Bocadillo + yogur + frutos secos',[['pan_barra',80],['fiambre_pavo',60],['queso_lonchas',30],['yog_prot',200],['frutos_secos',30]]],
   ],
   cen:[
-    ['Tortilla francesa con pan y jamón',695,43,'3 huevos · 100 g pan con tomate · 50 g jamón · 1 cda AOVE'],
-    ['Quesadillas de pollo',710,48,'2 tortillas grandes · 120 g pollo asado · 40 g queso · 50 g guacamole'],
-    ['Salmón con patata',620,36,'150 g salmón · 250 g patata (microondas) · 1 cda AOVE · verdura'],
-    ['Pasta con atún',660,38,'100 g pasta (seco) · 1 lata de atún · tomate triturado · 20 g queso · 1 cda AOVE'],
+    ['Tortilla francesa con pan y jamón',[['huevo',180],['pan_barra',100],['tomate',30],['jamon_serrano',50],['aove',10]]],
+    ['Quesadillas de pollo',[['tortilla_trigo',120],['pollo_asado',120],['queso_rallado',30],['guacamole',50]]],
+    ['Salmón con patata',[['salmon',150],['patata',250],['aove',10],['verdura_wok',150]],'Patata al microondas'],
+    ['Pasta con atún',[['pasta',100],['atun_ac',80],['tomate_trit',100],['queso_rallado',20],['aove',10]]],
   ],
   noc:[
-    ['Whey con leche',250,30,'250 ml leche · 1 cacito whey'],
-    ['Yogur griego con nueces',300,8,'1 yogur griego · 20 g nueces'],
-    ['Frutos secos (30 g)',180,6,'Un puñado'],
+    ['Whey con leche',[['leche_semi',250],['whey',25]]],
+    ['Yogur griego con nueces',[['yog_griego',125],['nueces',20]]],
+    ['Frutos secos',[['frutos_secos',30]]],
   ],
 };
+function ingAmount(k, g){ const u = (ING[k]||[])[5]; if (u) { const n = g/u[2]; if (Math.abs(n*2 - Math.round(n*2)) < 0.05 && n >= 0.5) { const t = Number.isInteger(n) ? n : String(n).replace('.',','); return `${t} ${n===1?u[0]:u[1]}`; } } return `${Math.round(g)} ${['leche','cafe'].includes((ING[k]||[])[3])?'ml':'g'}`; }
+function recipeTotals(ings){ let k=0, p=0; ings.forEach(([key,g,cu])=>{ const f = cu || ING[key]; if (f) { k += f[1]*g/100; p += f[2]*g/100; } }); return {k:Math.round(k/5)*5, p:Math.round(p)}; }
+function recipeDesc(ings){ return ings.filter(([key])=>key!=='cafe').map(([key,g,cu])=>`${ingAmount(cu?null:key,g)} ${((cu||ING[key])[0]).toLowerCase()}`).join(' · '); }
+// Compatibilidad: PLATOS = [nombre, kcal, prot, detalle]
+const PLATOS = Object.fromEntries(Object.entries(RECETAS).map(([m,list])=>[m, list.map(r=>{ const t = recipeTotals(r[1]); return [r[0], t.k, t.p, recipeDesc(r[1]) + (r[2]?' · '+r[2]:'')]; })]));
 const FCAT = {des:'Desayuno',pro:'Proteínas',hid:'Hidratos',lac:'Lácteos',fru:'Fruta y verdura',gra:'Grasas y frutos secos',pla:'Platos y bocadillos',sup:'Batidos y suplementos'};
 // [nombre, kcal, proteína g, categoría] · valores aproximados por ración
 const FOODS = [
@@ -1666,7 +1715,7 @@ function menuView(d, p, n){
     const tag = k==='mm' ? (str ? '<span class="chip ok" style="padding:2px 7px">hoy toca pesas</span>' : '<span class="chip" style="padding:2px 7px">solo días de pesas</span>')
       : isOpen ? '<span class="chip food" style="padding:2px 7px">ahora</span>' : kk ? `<span class="chip ok" style="padding:2px 7px">${kk} kcal ✓</span>` : '';
     h += `<details class="card menucard" ${isOpen?'open':''}><summary><div class="grow"><span class="xs mu b">${mealTime(k)}</span> <b>${esc(l)}</b> ${tag}<div class="xs mu">${tg?'Objetivo ≈'+tg+' kcal · ':''}${list.length} opciones</div></div></summary>
-      ${list.map((x,i)=>`<div class="frow"><div class="grow"><div class="sm b">${esc(x[0])}</div><div class="xs mu">${x[1]} kcal · ${x[2]} g prot</div><div class="xs mu" style="margin-top:2px;line-height:1.35">${esc(x[3])}</div></div><button class="add" data-act="fplan" data-m="${k}" data-v="${i}">+</button></div>`).join('')}</details>`;
+      ${list.map((x,i)=>`<div class="frow"><div class="grow"><div class="sm b">${esc(x[0])}</div><div class="xs mu">${x[1]} kcal · ${x[2]} g prot</div><div class="xs mu" style="margin-top:2px;line-height:1.35">${esc(x[3])}</div><button class="lnk" data-act="swopen" data-m="${k}" data-v="${i}">Cambiar ingredientes</button></div><button class="add" data-act="fplan" data-m="${k}" data-v="${i}">+</button></div>`).join('')}</details>`;
   });
   return h + `<div class="card tight"><div class="xs mu">Cantidades orientativas. Si una toma se queda corta, completa con la recena o con las ideas del registro. Plan completo en el documento del proyecto.</div></div>`;
 }
@@ -2050,6 +2099,8 @@ document.addEventListener('click', ev => {
     case 'petname': { const nm = ($('#petname').value||'').trim(); if (!nm) { toast('Escribe un nombre'); return; } S.cfg.pet.name = nm; saveCfg(); toast('¡Hola, '+nm+'!'); render(); break; }
     case 'splashgo': closeSplash(); break;
     case 'comsub': SUB.com = v; render(); break;
+    case 'swopen': openSwap(t.dataset.m, v); break;
+    case 'swdel': case 'swaddk': case 'swaddoff': case 'swaddman': case 'swoff': case 'swreset': case 'swlog': swAct(a, v); break;
     case 'fplan': { const x = PLATOS[t.dataset.m][+v]; addFood(t.dataset.m, [x[0], x[1], x[2]], 1); render(); break; }
     case 'wtab': WTAB = v; render(); break;
     case 'pettap': case 'pettap2': petHearts(t); pupJoy(); break;
@@ -2099,7 +2150,7 @@ document.addEventListener('click', ev => {
       if (k==null) { toast('Indica las kcal'); return; }
       if ($('#fms').checked) { S.cfg.foods = (S.cfg.foods||[]).filter(f=>f[0]!==nm); S.cfg.foods.unshift([nm,k,pr]); saveCfg(); }
       addFood(FS.meal, [nm,k,pr], 1); renderFoodSheet(); render(); break; }
-    case 'fsclose': FS = null; closeModal(); render(); break;
+    case 'fsclose': SW = null; FS = null; closeModal(); render(); break;
     case 'fdel': { const n = nutri(d); n.items[t.dataset.m].splice(+v,1); saveDay(d); render(); break; }
     case 'frepeat': { const y = nOf(addDays(d,-1)), n = nutri(d); n.items[t.dataset.m] = clone(y.items[t.dataset.m]); saveDay(d); toast('Copiado de ayer'); render(); break; }
     case 'fsnack': { const sn = SNACKS[+v]; addFood(t.dataset.m, [sn[0], sn[2], sn[3]], 1); render(); break; }
@@ -2553,6 +2604,78 @@ function wolfyCard(st){
     </div>
     <div class="xs mu wfoot">${w ? `Peso del ${fmtD(w.d)}` : 'Aún sin pesarte con báscula'}${wa||ar ? ` · medidas del ${fmtD((wa||ar).d)}` : ' · añade medidas en Más → Cuerpo'}</div>`}</div>`;
 }
+
+/* ================== CAMBIAR INGREDIENTES DE UN PLATO ================== */
+let SW = null;
+const normTxt = t => (t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+function swIng(x){ return x[2] || ING[x[0]]; }
+function swTotals(){ return recipeTotals(SW.ings.map(x=>[x[0],x[1],x[2]])); }
+function openSwap(m,i){ const r = RECETAS[m][+i]; SW = {m, i:+i, name:r[0], note:r[2]||'', ings:r[1].map(x=>[x[0],x[1],null]), orig:recipeTotals(r[1]), q:'', off:null, offMsg:''}; renderSwap(); }
+function swChanged(){ const r = RECETAS[SW.m][SW.i][1]; return SW.ings.length!==r.length || SW.ings.some((x,j)=>x[2] || x[0]!==r[j][0] || x[1]!==r[j][1]); }
+function swDiff(a,b,u){ const d = a-b; return d ? `<span class="${d>0?'up':'dn'}">${d>0?'+':'−'}${Math.abs(d)}${u}</span>` : `<span class="mu">=</span>`; }
+function swTotalsHTML(){ const t = swTotals();
+  return `<div class="swtot"><div><b>${t.k}</b><span> kcal</span><div class="xs">${swDiff(t.k,SW.orig.k,' kcal')}</div></div><div><b>${t.p}</b><span> g prot</span><div class="xs">${swDiff(t.p,SW.orig.p,' g')}</div></div><div class="xs mu" style="align-self:center">Original:<br>${SW.orig.k} kcal · ${SW.orig.p} g</div></div>`; }
+function swRowVals(x){ const f = swIng(x); return `${Math.round(f[1]*x[1]/100)} kcal · ${r1(f[2]*x[1]/100)} g`; }
+function swResults(){
+  const q = normTxt(SW.q).trim(); if (q.length < 2) return '';
+  const loc = Object.entries(ING).filter(([k,f])=>normTxt(f[0]).includes(q)).slice(0,6);
+  let h = loc.map(([k,f])=>`<button class="swres" data-act="swaddk" data-v="${k}"><b>${esc(f[0])}</b><span class="xs mu">${f[1]} kcal · ${f[2]} g prot / 100 g</span></button>`).join('');
+  if (!loc.length) h += `<div class="xs mu" style="margin:6px 2px">No está en la lista de ingredientes.</div>`;
+  if (q.length >= 3) h += `<button class="btn sm full mt8" data-act="swoff">Buscar «${esc(SW.q.trim())}» en Open Food Facts</button>`;
+  if (SW.offMsg) h += `<div class="xs mu mt8">${esc(SW.offMsg)}</div>`;
+  if (SW.off && SW.off.length) h += SW.off.map((o,j)=>`<button class="swres" data-act="swaddoff" data-v="${j}"><b>${esc(o[0])}</b><span class="xs mu">${o[1]} kcal · ${o[2]} g prot / 100 g</span></button>`).join('');
+  return h;
+}
+function renderSwap(){
+  const rows = SW.ings.map((x,j)=>{ const f = swIng(x), grp = f[3];
+    const alts = x[2] || grp==='cafe' ? null : Object.entries(ING).filter(([k,g])=>g[3]===grp);
+    const sel = alts ? `<select data-swp="ing" data-i="${j}">${alts.map(([k,g])=>`<option value="${k}" ${k===x[0]?'selected':''}>${esc(g[0])}</option>`).join('')}</select>` : `<div class="swname">${esc(f[0])}</div>`;
+    const u = !x[2] && ING[x[0]][5];
+    return `<div class="swrow">${sel}<div class="swg"><input data-swp="g" data-i="${j}" inputmode="decimal" value="${x[1]}"><span>${['leche','cafe'].includes(grp)?'ml':'g'}</span></div>
+      <div class="swv xs mu" id="swv${j}">${swRowVals(x)}${u?` · ${ingAmount(x[0],x[1])}`:''}</div><button class="swdel" data-act="swdel" data-v="${j}" aria-label="Quitar">×</button></div>`; }).join('');
+  modal(`<div class="eyebrow">${mealTime(SW.m)} · ${esc(mealName(SW.m))}</div><h2 class="mt4">${esc(SW.name)}</h2>
+    <div id="swtot">${swTotalsHTML()}</div>
+    <div class="xs mu mt8">Cambia un ingrediente por otro de su tipo o ajusta los gramos: los totales se recalculan solos.</div>
+    <div class="swlist mt8">${rows}</div>
+    <div class="swadd mt12"><input id="swq" placeholder="Añadir otro ingrediente (p. ej. gambas)" value="${esc(SW.q)}" autocomplete="off"><div id="swres">${swResults()}</div>
+      <details class="tips mt8"><summary>Escribir valores a mano</summary>
+        <input id="swmn" class="mt8" placeholder="Nombre"><div class="row mt8"><input id="swmk" inputmode="decimal" placeholder="kcal / 100 g"><input id="swmp" inputmode="decimal" placeholder="g prot / 100 g"><input id="swmg" inputmode="decimal" placeholder="gramos"></div>
+        <button class="btn sm full mt8" data-act="swaddman">Añadir</button></details></div>
+    ${SW.note?`<div class="xs mu mt12">${esc(SW.note)}</div>`:''}
+    <button class="btn pri full mt16" data-act="swlog">Apuntar en ${esc(mealName(SW.m).toLowerCase())}</button>
+    <div class="btns mt8"><button class="btn" data-act="swreset">Restablecer</button><button class="btn" data-act="fsclose">Cerrar</button></div>`);
+}
+function swUpdateTotals(){ const el = document.getElementById('swtot'); if (el) el.innerHTML = swTotalsHTML(); SW.ings.forEach((x,j)=>{ const v = document.getElementById('swv'+j); if (v) v.textContent = swRowVals(x) + (!x[2] && ING[x[0]][5] ? ` · ${ingAmount(x[0],x[1])}` : ''); }); }
+async function swSearchOFF(){
+  const q = SW.q.trim(); SW.off = null; SW.offMsg = 'Buscando…'; document.getElementById('swres').innerHTML = swResults();
+  if (!navigator.onLine) { SW.offMsg = 'Sin conexión: escribe los valores a mano.'; document.getElementById('swres').innerHTML = swResults(); return; }
+  try {
+    const r = await fetch(`https://es.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=12&fields=product_name,brands,nutriments`);
+    const j = await r.json();
+    SW.off = (j.products||[]).map(p=>{ const n = p.nutriments||{}, k = n['energy-kcal_100g'] ?? (n['energy_100g'] ? n['energy_100g']/4.184 : null), pr = n['proteins_100g'];
+      return (p.product_name && k!=null && pr!=null) ? [`${p.product_name}${p.brands?' · '+p.brands.split(',')[0]:''}`.slice(0,60), Math.round(k), r1(+pr)] : null; }).filter(Boolean).slice(0,6);
+    SW.offMsg = SW.off.length ? 'Resultados de Open Food Facts (datos de productos reales, pueden variar):' : 'Sin resultados con valores. Escríbelos a mano.';
+  } catch(e){ SW.offMsg = 'No se pudo buscar ahora. Escribe los valores a mano.'; }
+  if (SW) { const el = document.getElementById('swres'); if (el) el.innerHTML = swResults(); }
+}
+document.addEventListener('change', ev => { const t = ev.target; if (!SW || t.dataset.swp!=='ing') return;
+  const j = +t.dataset.i, old = SW.ings[j], o = ING[old[0]], n = ING[t.value];
+  SW.ings[j] = [t.value, Math.max(5, Math.round(old[1] / o[4] * n[4] / 5) * 5), null]; renderSwap(); });
+document.addEventListener('input', ev => { const t = ev.target; if (!SW) return;
+  if (t.dataset.swp==='g') { const v = parseFloat(String(t.value).replace(',','.')); SW.ings[+t.dataset.i][1] = isFinite(v) && v>=0 ? v : 0; swUpdateTotals(); }
+  if (t.id==='swq') { SW.q = t.value; SW.off = null; SW.offMsg = ''; document.getElementById('swres').innerHTML = swResults(); } });
+function swAct(a, v){
+  if (a==='swopen') return;
+  if (a==='swdel') { SW.ings.splice(+v,1); renderSwap(); }
+  if (a==='swaddk') { SW.ings.push([v, ING[v][4], null]); SW.q=''; SW.off=null; SW.offMsg=''; renderSwap(); }
+  if (a==='swaddoff') { const o = SW.off[+v]; SW.ings.push(['custom', 100, [o[0], o[1], o[2], 'custom', 100]]); SW.q=''; SW.off=null; SW.offMsg=''; renderSwap(); }
+  if (a==='swaddman') { const nm = ($('#swmn').value||'').trim(), k = parseFloat(($('#swmk').value||'').replace(',','.')), p = parseFloat(($('#swmp').value||'').replace(',','.')) || 0, g = parseFloat(($('#swmg').value||'').replace(',','.')) || 100;
+    if (!nm || !isFinite(k)) { toast('Pon al menos nombre y kcal'); return; } SW.ings.push(['custom', g, [nm, k, p, 'custom', 100]]); renderSwap(); }
+  if (a==='swoff') swSearchOFF();
+  if (a==='swreset') openSwap(SW.m, SW.i);
+  if (a==='swlog') { const t = swTotals(); addFood(SW.m, [SW.name + (swChanged()?' (con cambios)':''), t.k, t.p], 1); SW = null; closeModal(); render(); }
+}
+
 boot();
 
 </script>
