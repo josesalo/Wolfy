@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#D0DAE3">
 <title>Wolfy</title>
 <link rel="manifest" href="manifest.webmanifest">
-<script>window.__PWA=true;window.__BUILD="9e35322669";</script>
+<script>window.__PWA=true;window.__BUILD="c0205ac000";</script>
 <link rel="apple-touch-icon" sizes="180x180" href="img/wolfy-icon-180.png">
 <link rel="icon" type="image/png" href="img/wolfy-icon-512.png">
 <style>
@@ -2460,13 +2460,13 @@ const MINI = {
 let WTAB = 'det';
 function wolfyIdentity(){
   return `<div class="wrows">
-      <div class="wr"><span>ESPECIE</span><b>Husky blanco · lobezno</b></div>
-      <div class="wr"><span>ROL</span><b>Tu compañero de entreno y nutrición</b></div>
-      <div class="wr"><span>CARÁCTER</span><b>Adorable · Sano · Motivador</b></div>
-      <div class="wr"><span>TEMA</span><b>Progreso · Hábito · Crecimiento</b></div>
+      <div class="wr"><span>SPECIES</span><b>White Husky / Wolf Pup</b></div>
+      <div class="wr"><span>ROLE</span><b>Your fitness &amp; nutrition buddy</b></div>
+      <div class="wr"><span>VIBE</span><b>Cute · Wholesome · Motivating</b></div>
+      <div class="wr"><span>THEME</span><b>Progress · Habit · Growth</b></div>
     </div>
-    <div class="wcore"><div class="eyebrow" style="text-align:left">Aspecto</div><div class="cores">
-      ${[['core_front','Frente'],['core_side','Perfil'],['core_back','Espalda']].map(([k,l])=>`<div><img src="${IMG(k)}" alt="${l}"><span>${l}</span></div>`).join('')}</div></div>`;
+    <div class="wcore"><div class="eyebrow" style="text-align:left">Core Look</div><div class="cores">
+      ${[['core_front','Front'],['core_side','Side'],['core_back','Back']].map(([k,l])=>`<div><img src="${IMG(k)}" alt="${l}"><span>${l}</span></div>`).join('')}</div></div>`;
 }
 function wolfyCard(st){
   const w = lastVal(dd=>dd.check && dd.check.weight), wa = lastVal(dd=>dd.measures && dd.measures.cintura), ar = lastVal(dd=>dd.measures && dd.measures.brazo);
@@ -2474,7 +2474,7 @@ function wolfyCard(st){
   const fig = S.cfg.pet.look && unlockedLooks(st).includes(S.cfg.pet.look) ? `<img class="avbig" src="${avatarImg(st)}" alt="" data-act="pettap2">` : `<div class="avbig2" data-act="pettap2">${pupFig(st.stage,'happy',wornAccs(st,'gym'))}</div>`;
   return `<div class="card wcard"><div class="wfig">${fig}</div>
     <div class="wname">${esc(petName())}</div><div class="wst">${STAGES[st.stage].n} · ${st.stage+1}/5</div>
-    <div class="wtabs"><button class="${WTAB==='det'?'on':''}" data-act="wtab" data-v="det">Detalles</button><button class="${WTAB==='id'?'on':''}" data-act="wtab" data-v="id">Identidad</button></div>
+    <div class="wtabs"><button class="${WTAB==='det'?'on':''}" data-act="wtab" data-v="det">Detalles</button><button class="${WTAB==='id'?'on':''}" data-act="wtab" data-v="id">Identity</button></div>
     ${WTAB==='id' ? wolfyIdentity() : `<div class="wrows">
       <div class="wr"><span>EDAD</span><b>${wolfyAge()}</b></div>
       <div class="wr"><span>RACHA</span><b>${sk.cur} ${sk.cur===1?'día':'días'}${sk.best?` · récord ${sk.best}`:''}</b></div>
